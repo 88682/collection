@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Comments Page</title>
+  <link rel="icon" type="image/PNG" href="media/post/post1.png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .comments-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .image {
+      max-width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+    }
+    .comment-form {
+      width: 100%;
+      max-width: 500px;
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input[type="submit"] {
+      background-color: #881111;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    input[type="submit"]:hover {
+      background-color: #881111;
+    }
+    .comments {
+      width: 100%;
+      max-width: 500px;
+    }
+    .comment {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+<h1>Comments/Reviews</h1>
+
+<div class="comments-container">
+  <img id="myImg" src="media/post/post1.png" alt="10KING-flower" style="width:14vw";>
+  <h4 >King 6153</h4>
+  <p>1 pc</p>
+  <p>Made on:6-1-2008</p>
+  <p><i class="fa-solid fa-star"></i>Rare </p>
+  <p><b>Detailed Descriptions:</b></p>
+  <p>This stamp was made and desinged by Luca Patrica. Very precious and rare stamp. dates back to 2008. </p>
+  <p>For the company 10KING. It was relased in smal quantities. Only sold on our website.</p>
+  <br><br><br>
+
+  <form id="comment-form">
+    <label for="name">Name:</label>
+    <input type="text" id="name" required><br><br>
+
+    <label for="comment">Comment:</label>
+    <textarea id="comment" rows="4" cols="50" required></textarea><br><br>
+
+    <input type="submit" value="Submit Comment">
+  </form>
+
+  <div class="comments" id="comments">
+
+  </div>
+</div>
+
+<script>
+
+  const commentForm = document.getElementById("comment-form");
+  const nameInput = document.getElementById("name");
+  const commentInput = document.getElementById("comment");
+  const commentsContainer = document.getElementById("comments");
+
+  commentForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+
+    const name = nameInput.value;
+    const comment = commentInput.value;
+
+
+    const commentObject = { name, comment };
+
+
+    let comments = localStorage.getItem("comments");
+    if (!comments) {
+      comments = [];
+    } else {
+      comments = JSON.parse(comments);
+    }
+    comments.push(commentObject);
+    localStorage.setItem("comments", JSON.stringify(comments));
+
+
+    displayComment(commentObject);
+
+    nameInput.value = "";
+    commentInput.value = "";
+  });
+
+  function displayComment(commentObject) {
+    const commentDiv = document.createElement("div");
+    commentDiv.classList.add("comment");
+    commentDiv.innerHTML = `
+                <strong>${commentObject.name}:</strong><br>
+                ${commentObject.comment}
+            `;
+    commentsContainer.appendChild(commentDiv);
+  }
+
+
+  let existingComments = localStorage.getItem("comments");
+  if (existingComments) {
+    existingComments = JSON.parse(existingComments);
+    existingComments.forEach(displayComment);
+  }
+
+
+
+  function deleteComment(commentObject) {
+    const nameToDelete = commentObject.name;
+    let comments = JSON.parse(localStorage.getItem("comments"));
+
+    if (comments) {
+
+      comments = comments.filter((comment) => comment.name !== nameToDelete);
+      localStorage.setItem("comments", JSON.stringify(comments));
+    }
+  }
+  function displayComment(commentObject) {
+    const commentDiv = document.createElement("div");
+    commentDiv.classList.add("comment");
+    commentDiv.innerHTML = `
+    <strong>${commentObject.name}:</strong><br>
+    ${commentObject.comment}
+    <button class="delete-comment">Delete</button>
+  `;
+    commentsContainer.appendChild(commentDiv);
+
+
+    const deleteButton = commentDiv.querySelector(".delete-comment");
+    deleteButton.addEventListener("click", function () {
+      deleteComment(commentObject);
+      commentDiv.remove();
+    });
+  }
+
+</script>
+</body>
+</html>
