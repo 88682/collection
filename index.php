@@ -29,7 +29,6 @@
         <li><a href="collection.php" target="_blank">Collection</a></li>
         <li><a href="#C3" >Contact</a></li>
         <li><a href="login.html" target="_blank">Add</a></li>
-
     </ul>
 
 </header>

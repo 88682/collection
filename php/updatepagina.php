@@ -1,39 +1,50 @@
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
 include 'config.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $newNaam = $_POST['naam'];
-        $newPC = $_POST['pc'];
-        $newDatum = $_POST['datum'];
-        $newRare = $_POST['rare'];
-        $newPrijs = $_POST['prijs'];
-        $newAbout = $_POST['about'];
-
-        if ($_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $imageTmpName = $_FILES['image']['tmp_name'];
-            $imageFileName = $_FILES['image']['name'];
+        try {
+            $newNaam = $_POST['naam'];
+            $newPC = $_POST['pc'];
+            $newDatum = $_POST['datum'];
+            $newRare = $_POST['rare'];
+            $newPrijs = $_POST['prijs'];
 
 
-            $uploadPath = '../media' . $imageFileName;
-            move_uploaded_file($imageTmpName, $uploadPath);
-        } else {
+            if ($_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $imageTmpName = $_FILES['image']['tmp_name'];
+                $imageFileName = $_FILES['image']['name'];
 
+                $uploadPath = '../media' . $imageFileName;
+                if (move_uploaded_file($imageTmpName, $uploadPath)) {
+                    // File uploaded successfully
+                } else {
+                    throw new Exception("Error uploading file.");
+                }
+            }
+
+            $updateSql = "UPDATE verzamelaar SET naam = ?, pc = ?, datum = ?, rare = ?, prijs = ?, image = ? WHERE id = ?";
+            $stmt = $conn->prepare($updateSql);
+            $stmt->bind_param("ssssssi", $newNaam, $newPC, $newDatum, $newRare, $newPrijs, $imageFileName, $id);
+
+            if ($stmt->execute()) {
+                echo "Project updated successfully.";
+            } else {
+                echo "Error updating project: " . $stmt->error;
+            }
+
+            $stmt->close();
+        } catch (Exception $e) {
+            echo "An error occurred: " . $e->getMessage();
         }
-
-        $updateSql = "UPDATE verzamelaar SET naam = ?, pc = ?, datum = ?, rare = ?, prijs = ?, about = ?, image = ? WHERE id = ?";
-        $stmt = $conn->prepare($updateSql);
-        $stmt->bind_param("sssssssi", $newNaam, $newPC, $newDatum, $newRare, $newPrijs, $newAbout, $imageFileName, $id);
-
-        if ($stmt->execute()) {
-            echo "Project updated successfully.";
-        } else {
-            echo "Error updating project: " . $stmt->error;
-        }
-
-        $stmt->close();
     } else {
         $sql = "SELECT * FROM verzamelaar WHERE id = ?";
         $stmt = $conn->prepare($sql);
@@ -48,24 +59,15 @@ if (isset($_GET['id'])) {
             $currentDatum = $row['datum'];
             $currentRare = $row['rare'];
             $currentPrijs = $row['prijs'];
-            $currentAbout = $row['about'];
             $currentImage = $row['image'];
             ?>
 
             <!DOCTYPE html>
             <html lang="nl-NL">
-
-            <head>
-
-            </head>
-
+            <head></head>
             <body>
-            <header>
-
-            </header>
-
+            <header></header>
             <h1>Edit Project</h1>
-
             <div class="containerform">
                 <form action="updatepagina.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
                     <label>Upload image:</label><br>
@@ -80,16 +82,11 @@ if (isset($_GET['id'])) {
                     <input type="text" name="rare" value="<?php echo $currentRare; ?>" maxlength="30"><br>
                     <label>Prijs:</label><br>
                     <input type="text" name="prijs" value="<?php echo $currentPrijs; ?>" maxlength="30"><br>
-
                     <input type="submit" value="Update Project">
                 </form>
             </div>
-
-            <footer id="footer">
-
-            </footer>
+            <footer id="footer"></footer>
             </body>
-
             </html>
 
             <?php
@@ -104,9 +101,10 @@ if (isset($_GET['id'])) {
 $conn->close();
 ?>
 
+
 <style>
 
-    /*/////////////Contact /////////////////*/
+
     form{
         animation: 1s ease-out 0s 1 slideInFromLeft;
     }
