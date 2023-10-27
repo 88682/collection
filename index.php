@@ -29,7 +29,7 @@
         <li><a href="collection.php" target="_blank">Collection</a></li>
         <li><a href="#C3" >Contact</a></li>
         <li><a href="login.html" target="_blank">Add</a></li>
-
+        <li><a href="login.php" target="_blank">Login</a></li>
     </ul>
 
 </header>
@@ -102,7 +102,7 @@
         }
         slides[slideIndex-1].style.display = "block";
         dots[slideIndex-1].className += " active";
-        setTimeout(showSlides, 2000); // Change image every 2 seconds
+        setTimeout(showSlides, 2000);
     }
 </script>
 
